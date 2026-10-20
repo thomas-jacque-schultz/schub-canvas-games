@@ -5,7 +5,9 @@ import { playerId, playerName, rememberName } from "../identity";
 import { type Evenement, type Joueur, Relais } from "../relay/relay";
 import { Board } from "./Board";
 import { Flux } from "./flux";
+import { Consigne, Devinette, Scores } from "./Jeu";
 import { estMorceau, type Morceau, Tableau } from "./traits";
+import { estMessageJeu, type MessageJeu, usePartie } from "./usePartie";
 
 const COULEURS = [
   "#F2E9EE",
@@ -114,6 +116,29 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
   const [couleur, setCouleur] = useState(COULEURS[0]);
   const [epaisseur, setEpaisseur] = useState(EPAISSEURS[1]);
   const [copie, setCopie] = useState(false);
+  const [maintenant, setMaintenant] = useState(() => Date.now());
+
+  const envoieJeu = useCallback(
+    (message: MessageJeu) => relais.current?.envoie(message, false),
+    [],
+  );
+  const effaceTout = useCallback(() => {
+    relais.current?.efface();
+    tableau.vide();
+    setVersion((v) => v + 1);
+  }, [tableau]);
+  const jeu = usePartie({
+    moi,
+    meneur,
+    joueurs,
+    lang,
+    envoie: envoieJeu,
+    efface: effaceTout,
+  });
+  // L'écoute du relais reste stable : la changer rouvrirait la connexion.
+  const recoitJeu = useRef(jeu.recoit);
+  recoitJeu.current = jeu.recoit;
+  const enPartie = useRef(jeu.courante);
 
   const ecoute = useCallback(
     (evenement: Evenement) => {
@@ -138,11 +163,20 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
           setJoueurs(evenement.players);
           setMeneur(evenement.leader);
           break;
-        case "message":
-          if (estMorceau(evenement.data)) {
+        case "message": {
+          const p = enPartie.current.current;
+          if (estMessageJeu(evenement.data)) {
+            recoitJeu.current(evenement.from, evenement.data);
+          } else if (
+            estMorceau(evenement.data) &&
+            (!p ||
+              p.phase === "fin" ||
+              (p.phase === "dessin" && evenement.from === p.dessinateur))
+          ) {
             recus.emet(evenement.data);
           }
           break;
+        }
         case "cleared":
           tableau.vide();
           setVersion((v) => v + 1);
@@ -171,6 +205,25 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
   }, [demande, ecoute, moi, nom]);
 
   const lien = room ? `${location.origin}/${room}` : null;
+  const { partie } = jeu;
+  const enCours = partie?.phase === "choix" || partie?.phase === "dessin";
+
+  useEffect(() => {
+    if (!enCours) {
+      return;
+    }
+    const minuterie = window.setInterval(() => setMaintenant(Date.now()), 250);
+    return () => window.clearInterval(minuterie);
+  }, [enCours]);
+
+  const dessinable =
+    !partie ||
+    partie.phase === "fin" ||
+    (partie.phase === "dessin" && partie.dessinateur === moi);
+  const devine =
+    partie?.phase === "dessin" &&
+    partie.devineurs.includes(moi) &&
+    !partie.trouve.includes(moi);
 
   return (
     <main className="salon">
@@ -216,8 +269,26 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
                 )}
               </p>
             )}
+            {etat === "salon" && (
+              <Consigne
+                lang={lang}
+                partie={partie}
+                moi={moi}
+                estMeneur={jeu.estMeneur}
+                restantMs={
+                  partie
+                    ? Math.max(0, partie.restantMs - (maintenant - jeu.recuA))
+                    : 0
+                }
+                nbJoueurs={joueurs.length}
+                erreur={jeu.erreur}
+                onLance={jeu.lance}
+                onChoisis={jeu.choisis}
+              />
+            )}
             <Board
               tableau={tableau}
+              actif={dessinable}
               couleur={couleur}
               epaisseur={epaisseur}
               version={version}
@@ -225,7 +296,14 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
               onMorceau={(morceau) => relais.current?.envoie(morceau, true)}
               recus={recus}
             />
-            <div className="outils">
+            {devine && (
+              <Devinette
+                lang={lang}
+                proche={jeu.proche}
+                onDevine={jeu.devine}
+              />
+            )}
+            <div className={dessinable ? "outils" : "outils cache"}>
               {COULEURS.map((c) => (
                 <button
                   key={c}
@@ -264,17 +342,32 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
             </div>
           </div>
           <aside className="joueurs">
-            <h2>{texte(lang, "joueurs")}</h2>
-            <ul>
-              {joueurs.map((j) => (
-                <li key={j.id} className={j.id === moi ? "moi" : undefined}>
-                  {j.name}
-                  {j.id === meneur && (
-                    <span className="meneur"> · {texte(lang, "meneur")}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            {partie ? (
+              <Scores
+                lang={lang}
+                partie={partie}
+                joueurs={joueurs}
+                moi={moi}
+                meneur={meneur}
+              />
+            ) : (
+              <>
+                <h2>{texte(lang, "joueurs")}</h2>
+                <ul>
+                  {joueurs.map((j) => (
+                    <li key={j.id} className={j.id === moi ? "moi" : undefined}>
+                      {j.name}
+                      {j.id === meneur && (
+                        <span className="meneur">
+                          {" "}
+                          · {texte(lang, "meneur")}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </aside>
         </div>
       )}

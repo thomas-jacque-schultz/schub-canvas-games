@@ -11,6 +11,8 @@ interface Props {
   // Change à chaque effacement ou rejeu de l'historique : le tableau se redessine en entier.
   version: number;
   auteur: string;
+  // Pendant une partie, seul le dessinateur dessine.
+  actif: boolean;
   onMorceau: (morceau: Morceau) => void;
   recus: Flux<Morceau>;
 }
@@ -21,6 +23,7 @@ export function Board({
   epaisseur,
   version,
   auteur,
+  actif,
   onMorceau,
   recus,
 }: Props) {
@@ -114,8 +117,11 @@ export function Board({
   return (
     <canvas
       ref={canvas}
-      className="tableau"
+      className={actif ? "tableau" : "tableau inactif"}
       onPointerDown={(event) => {
+        if (!actif) {
+          return;
+        }
         event.currentTarget.setPointerCapture(event.pointerId);
         enCours.current = { id: `${auteur}-${compteur.current++}`, points: [] };
         const p = point(event);

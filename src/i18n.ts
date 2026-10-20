@@ -24,6 +24,31 @@ const textes = {
     erreur_REPLACED: "Ce salon est ouvert dans un autre onglet.",
     erreur_INVALID: "Le salon n'a pas compris la demande.",
     nouveau: "Nouveau salon",
+    duree: "Durée d'une manche",
+    secondes: "{n} s",
+    lancer: "Lancer la partie",
+    attenteMeneur: "Le meneur lance la partie quand tout le monde est là.",
+    attenteJoueurs: "Il faut au moins deux joueurs pour lancer une partie.",
+    choisisMot: "Choisis le champion à dessiner",
+    choisitMot: "{nom} choisit un champion…",
+    dessine: "Dessine : {mot}",
+    lettres: "{n} lettres",
+    trouveMoi: "Trouvé ! C'était {mot}",
+    cetait: "C'était : {mot}",
+    reponse: "Ta réponse",
+    proposer: "Proposer",
+    proche: "Presque !",
+    aTrouve: "{nom} a trouvé !",
+    scores: "Scores",
+    reponses: "Réponses",
+    dessinateur: "dessine",
+    points: "{n} pts",
+    recap: "Fin du tour",
+    rejouer: "Rejouer",
+    recapAttente: "Le meneur peut relancer une partie.",
+    erreurMots: "Impossible de charger les champions, réessaie.",
+    chrono: "Temps restant",
+    ligne: "{nom}\u00a0: {texte}",
   },
   en: {
     titre: "Scribble",
@@ -49,12 +74,44 @@ const textes = {
     erreur_REPLACED: "This room is open in another tab.",
     erreur_INVALID: "The room did not understand the request.",
     nouveau: "New room",
+    duree: "Round length",
+    secondes: "{n} s",
+    lancer: "Start the game",
+    attenteMeneur: "The leader starts the game once everyone is here.",
+    attenteJoueurs: "You need at least two players to start a game.",
+    choisisMot: "Pick the champion to draw",
+    choisitMot: "{nom} is picking a champion…",
+    dessine: "Draw: {mot}",
+    lettres: "{n} letters",
+    trouveMoi: "Got it! It was {mot}",
+    cetait: "It was: {mot}",
+    reponse: "Your guess",
+    proposer: "Guess",
+    proche: "So close!",
+    aTrouve: "{nom} got it!",
+    scores: "Scores",
+    reponses: "Guesses",
+    dessinateur: "drawing",
+    points: "{n} pts",
+    recap: "End of the round",
+    rejouer: "Play again",
+    recapAttente: "The leader can start a new game.",
+    erreurMots: "Could not load the champions, try again.",
+    chrono: "Time left",
+    ligne: "{nom}: {texte}",
   },
 } as const;
 
 export type Cle = keyof (typeof textes)["fr"];
 
-export const texte = (lang: Lang, cle: Cle): string => textes[lang][cle];
+export const texte = (
+  lang: Lang,
+  cle: Cle,
+  valeurs: Record<string, string | number> = {},
+): string =>
+  textes[lang][cle].replace(/\{(\w+)\}/g, (tout, nom: string) =>
+    nom in valeurs ? String(valeurs[nom]) : tout,
+  );
 
 export const langueDuNavigateur = (): Lang =>
   navigator.language?.startsWith("fr") ? "fr" : "en";

@@ -9,6 +9,7 @@
   --prune: #a4477e;
   --liseré: rgba(201, 162, 39, 0.25);
   --erreur: #e0576b;
+  --succes: #4fb783;
   color-scheme: dark;
   font-family: "Space Grotesk", system-ui, sans-serif;
   color: var(--texte);
@@ -213,4 +214,117 @@ input {
   display: grid;
   gap: 12px;
   justify-items: start;
+}
+
+.consigne {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 40px;
+  margin-bottom: 8px;
+}
+
+.reglage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--texte-2);
+}
+
+select {
+  font: inherit;
+  color: var(--texte);
+  background: var(--carte);
+  border: 1px solid var(--liseré);
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+
+.aide {
+  color: var(--texte-2);
+  font-size: 0.875rem;
+}
+
+.erreur {
+  color: var(--erreur);
+  font-size: 0.875rem;
+}
+
+.chrono {
+  margin-left: auto;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 1.25rem;
+  color: var(--or);
+  min-width: 3ch;
+  text-align: right;
+}
+
+.masque {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 1.25rem;
+  letter-spacing: 0.3em;
+  white-space: pre;
+}
+
+.devinette {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.devinette input {
+  flex: 1;
+  min-width: 0;
+}
+
+.proche {
+  color: var(--or);
+  font-size: 0.875rem;
+}
+
+.scores {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.scores li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.points {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  color: var(--texte-2);
+  white-space: nowrap;
+}
+
+.trouve {
+  color: var(--succes);
+}
+
+.fil {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--texte-2);
+  max-height: 240px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+
+.cache {
+  display: none;
+}
+
+.tableau.inactif {
+  cursor: default;
 }

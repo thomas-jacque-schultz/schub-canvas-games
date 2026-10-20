@@ -187,8 +187,7 @@ function Salon({ contexte, nom }: { contexte: Contexte; nom: string }) {
               })
             }
           >
-            {texte(lang, copie ? "copie" : "copier")} ·{" "}
-            {texte(lang, "partager")}
+            {texte(lang, copie ? "copie" : "copier")}
           </button>
         )}
       </header>

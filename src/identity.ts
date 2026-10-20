@@ -23,7 +23,10 @@ export const playerId = (): string => {
   if (connu) {
     return connu;
   }
-  const neuf = crypto.randomUUID();
+  // getRandomValues plutôt que randomUUID, réservé aux pages en HTTPS.
+  const neuf = Array.from(crypto.getRandomValues(new Uint8Array(16)), (octet) =>
+    octet.toString(16).padStart(2, "0"),
+  ).join("");
   ecrit(CLE_ID, neuf);
   return neuf;
 };

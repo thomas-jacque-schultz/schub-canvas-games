@@ -12,9 +12,8 @@ const textes = {
     meneur: "mène",
     effacer: "Effacer le tableau",
     epaisseur: "Épaisseur",
-    partager: "Lien du salon",
-    copier: "Copier",
-    copie: "Copié",
+    copier: "Copier le lien",
+    copie: "Lien copié",
     erreur_ROOM_NOT_FOUND: "Ce salon n'existe plus.",
     erreur_ROOM_FULL: "Ce salon est plein (10 joueurs).",
     erreur_TOO_MANY_ROOMS:
@@ -37,9 +36,8 @@ const textes = {
     meneur: "leads",
     effacer: "Clear the board",
     epaisseur: "Width",
-    partager: "Room link",
-    copier: "Copy",
-    copie: "Copied",
+    copier: "Copy link",
+    copie: "Link copied",
     erreur_ROOM_NOT_FOUND: "This room no longer exists.",
     erreur_ROOM_FULL: "This room is full (10 players).",
     erreur_TOO_MANY_ROOMS:

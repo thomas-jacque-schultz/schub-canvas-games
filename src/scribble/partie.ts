@@ -271,7 +271,10 @@ export const avancer = (
   return restantMs === 0 ? manche(suite, p.tour + 1, presents, hasard) : suite;
 };
 
-/** Qui arrive dessinera plus tard dans le tour et devinera dès la manche suivante ; un dessinateur parti clôt la manche. */
+/**
+ * Qui arrive dessinera plus tard dans le tour et devinera dès la manche suivante. Un dessinateur parti clôt la
+ * manche, comme le départ du dernier qui n'avait pas trouvé.
+ */
 export const presence = (p: Partie, presents: Present[]): Partie => {
   const ids = presents.map((j) => j.id);
   const nouveaux = presents.filter((j) => !p.ordre.includes(j.id));
@@ -286,9 +289,13 @@ export const presence = (p: Partie, presents: Present[]): Partie => {
       ...p.noms,
       ...Object.fromEntries(presents.map((j) => [j.id, j.name])),
     },
+    devineurs: p.devineurs.filter((id) => ids.includes(id)),
   };
-  const dessinateurParti = !ids.includes(p.dessinateur);
-  if ((p.phase === "dessin" || p.phase === "choix") && dessinateurParti) {
+  const enJeu = p.phase === "dessin" || p.phase === "choix";
+  const tousTrouve =
+    p.phase === "dessin" &&
+    suite.devineurs.every((id) => suite.trouve.includes(id));
+  if (enJeu && (!ids.includes(p.dessinateur) || tousTrouve)) {
     return bilan(suite);
   }
   return suite;

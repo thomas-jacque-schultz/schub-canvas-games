@@ -102,4 +102,10 @@ describe("partie", () => {
     expect(deviner(p, "d", "kaisa").partie.scores.d).toBe(0);
     expect(presence(enDessin(), [B, C]).phase).toBe("bilan");
   });
+
+  it("le départ du dernier qui cherchait clôt la manche", () => {
+    const p = deviner(enDessin(), "b", "kaisa").partie;
+    expect(presence(p, [A, B]).phase).toBe("bilan");
+    expect(presence(p, [A, B, C]).phase).toBe("dessin");
+  });
 });

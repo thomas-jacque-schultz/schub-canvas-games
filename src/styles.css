@@ -119,8 +119,12 @@ input {
   }
 }
 
+/* Le tableau prend la hauteur qui reste : dans l'iframe de PremadeLab, le champ de réponse reste sous les yeux. */
 .zone {
   position: relative;
+  width: min(100%, calc((100vh - 184px) * 4 / 3));
+  width: min(100%, calc((100dvh - 184px) * 4 / 3));
+  justify-self: center;
 }
 
 .tableau {
